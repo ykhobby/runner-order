@@ -13,7 +13,9 @@
   const pickListeners = [];
   function load() {
     if (entries) return Promise.resolve(entries);
-    if (!loading) loading = fetch('catalogue.json').then(response => {
+    // The release stamp keeps a freshly deployed page from reading a stale catalogue from the browser cache.
+    const version = (document.querySelector('meta[name="runner-version"]') || {}).content || 'dev';
+    if (!loading) loading = fetch(`catalogue.json?v=${encodeURIComponent(version)}`).then(response => {
       if (!response.ok) throw new Error('The kit catalogue could not load.');
       return response.json();
     }).then(data => (entries = K.parseCatalogue(data))).catch(error => { loading = null; throw error; });

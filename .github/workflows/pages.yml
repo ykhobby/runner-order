@@ -27,6 +27,13 @@ jobs:
         with:
           node-version: 20
       - run: node --test tests/*.test.cjs
+      # GitHub Pages lets browsers reuse files for 10 minutes; stamping links with this release
+      # makes a new page fetch its matching stylesheet and scripts instead of mixing old and new.
+      - name: Stamp asset links with this release
+        run: |
+          version="${GITHUB_SHA::7}"
+          sed -i "s/?v=dev/?v=${version}/g; s/name=\"runner-version\" content=\"dev\"/name=\"runner-version\" content=\"${version}\"/" dist/*.html
+          grep -c "?v=${version}" dist/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
