@@ -126,7 +126,7 @@ h3 { font-size: 22px; line-height: 1.1; font-weight: 700; text-transform: upperc
 .brand-mark .brand-gate { stroke-width: 2.5; }
 .brand-mark .brand-gate-link { stroke-width: 2; }
 .brand-text { display: flex; flex-direction: column; min-width: 0; }
-.brand-name { font-size: 44px; line-height: .9; font-weight: 700; text-transform: uppercase; letter-spacing: .01em; }
+.brand-name { font-size: 44px; line-height: .9; white-space: nowrap; font-weight: 700; text-transform: uppercase; letter-spacing: .01em; }
 .brand-caption { margin-top: 6px; font-size: 14px; color: var(--muted); }
 .brand-caption strong { color: var(--accent); font-weight: 600; }
 .brand-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
@@ -186,7 +186,7 @@ select { color: var(--ink); border: 1.5px solid var(--line); background: var(--s
 /* Workspace: two manual sheets */
 .workspace { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 20px; align-items: start; }
 .entry-pane, .output-pane { min-width: 0; padding: 0 26px 28px; background: var(--pane); border: 1.5px solid var(--rule); border-radius: var(--radius); min-height: 610px; }
-.pane-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pane-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .entry-pane > .pane-heading, .output-pane > .pane-heading { margin: 0 -26px; padding: 18px 26px; border-bottom: 2px solid var(--rule); }
 .step { display: flex; align-items: center; gap: 14px; }
 .step-no { display: grid; place-items: center; width: 46px; height: 46px; flex-shrink: 0; background: var(--mark); color: var(--on-mark); font-size: 30px; font-weight: 700; line-height: 1; border-radius: 2px; }
@@ -287,6 +287,12 @@ footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 3
   h1 { font-size: 52px; }
   .project-file { padding-left: 0; border-left: 0; }
 }
+@media (max-width: 960px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .entry-pane, .output-pane { min-height: auto; }
+  .output-pane { min-height: 390px; }
+  .brand-bar { flex-wrap: wrap; }
+}
 @media (max-width: 780px) {
   .project-header { align-items: start; flex-direction: column; gap: 24px; padding: 30px 0 24px; }
   .project-field { width: 100%; }
@@ -295,9 +301,6 @@ footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 3
   .project-picker { margin-left: 0; flex-wrap: wrap; }
   .project-picker label { width: 100%; }
   .project-picker select { flex: 1; min-width: 0; width: auto; }
-  .workspace { grid-template-columns: minmax(0, 1fr); }
-  .entry-pane, .output-pane { min-height: auto; }
-  .output-pane { min-height: 390px; }
   .mobile-jump { display: inline-flex; align-items: center; min-height: 44px; margin-top: 6px; }
   .entry-empty { padding: 28px 12px; }
   .output-empty { padding-top: 36px; }
