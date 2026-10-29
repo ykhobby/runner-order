@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy · Runner Order</title>
+  <link rel="icon" href="apple-touch-icon.png">
+  <script>
+    (function () {
+      var choice = 'auto';
+      try { choice = localStorage.getItem('runner-notes.theme') || 'auto'; } catch (e) {}
+      if (choice === 'crimson') choice = 'char';
+      var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = choice === 'auto' ? (dark ? 'dark' : 'light') : choice;
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell legal-page">
+    <a class="back-link" href="./">← Back to Runner Order</a>
+    <p class="eyebrow">Last updated 29 October 2026</p>
+    <h1>Privacy</h1>
+    <p>Runner Order is a free tool made by YK.Hobby for organising model kit parts. This page explains what information it keeps and why.</p>
+
+    <h2>Without an account</h2>
+    <p>Your projects, sections and part lists are saved only in your own browser. They are never sent to us. Your colour theme is stored the same way. Clearing your browser data removes them, so use <strong>Export file</strong> to keep a backup.</p>
+
+    <h2>With an account</h2>
+    <p>If you sign in, we keep:</p>
+    <ul>
+      <li><strong>Your email address</strong>, used only to sign you in. It is never shown to other people.</li>
+      <li><strong>A display name</strong>, taken from your Google profile or the start of your email address. It appears on kits you share, and you can change it at any time.</li>
+      <li><strong>Cloud copies of your saved projects</strong>, so you can open them on other devices. Only you can see them.</li>
+      <li><strong>Kits you share</strong>, which are public, and the confirmations and reports you make. Reports are visible only to the library admins.</li>
+    </ul>
+
+    <h2>Services we use</h2>
+    <ul>
+      <li><strong>Supabase</strong> stores accounts, cloud projects and the kit library, and handles sign-in.</li>
+      <li><strong>Google</strong> confirms your identity if you choose "Continue with Google". We receive your name and email address, nothing else.</li>
+      <li><strong>Resend</strong> delivers sign-in emails.</li>
+      <li><strong>Web3Forms</strong> delivers messages sent with the feedback form, including the name and email you enter.</li>
+      <li><strong>GitHub Pages</strong> hosts the website, and <strong>jsDelivr</strong> serves the sign-in library. Like most websites, they may log technical details such as your IP address.</li>
+    </ul>
+    <p>We do not sell your information, show ads, or use tracking or analytics cookies.</p>
+
+    <h2>Your choices</h2>
+    <ul>
+      <li>Change your display name or sign out from the account menu.</li>
+      <li><strong>Delete account</strong> in the account menu removes your account and its cloud projects straight away. Kits you shared stay in the library without your name, as the <a href="terms.html">Terms</a> allow.</li>
+      <li>For anything else, including a copy of your data, use <strong>Send feedback</strong> on the main page.</li>
+    </ul>
+  </main>
+</body>
+</html>

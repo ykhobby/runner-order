@@ -15,6 +15,7 @@
   let exportChoiceMade = false;
   let exportURL = null;
   let exportedData = null;
+  const changeListeners = [];
   const exportData = () => JSON.stringify({ name: project.name, sections: project.sections });
   const icons = {
     up: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg>',
@@ -75,6 +76,7 @@
     renderEditors();
     renderOutput();
     save();
+    changeListeners.forEach(listener => listener(library));
     return result;
   }
   function projectAction(operation, message) {
@@ -90,6 +92,8 @@
   }
   $('save-project').addEventListener('click', () => projectAction(next => L.saveCurrent(next), entry => `Saved "${entry.project.name}" on this device.`));
   $('new-project').addEventListener('click', () => {
+    // With the community library connected, New project first checks whether the kit is already shared.
+    if (window.RunnerCommunity && window.RunnerCommunity.startNew()) return;
     if (projectAction(next => L.startNew(next), saved => saved ? `Saved "${saved.project.name}". Your new project is ready.` : 'Your new project is ready.')) $('project-name').focus();
   });
   $('export-project').addEventListener('click', () => {
@@ -233,6 +237,23 @@
     root.append(list);
     return root;
   }
+  // The cutting list for any project; also used to preview community kits.
+  function cuttingList(source) {
+    const parts = P.projectParts(source);
+    const fragment = document.createDocumentFragment();
+    if (source.view === 'runner') P.groupParts(parts).forEach(group => fragment.append(runnerGroup(group, true)));
+    else if (parts.length > 0) source.sections.forEach(section => {
+      const parsed = P.parseParts(section.raw);
+      const root = element('div', 'output-section');
+      const heading = element('div', 'output-section-heading');
+      heading.append(element('h3', '', P.sectionName(section)), element('span', '', plural(parsed.parts.length, 'part')));
+      root.append(heading);
+      if (parsed.parts.length === 0) root.append(element('p', 'empty-section', 'No recognised parts in this section yet.'));
+      P.groupParts(parsed.parts).forEach(group => root.append(runnerGroup(group, false)));
+      fragment.append(root);
+    });
+    return fragment;
+  }
   function renderOutput() {
     if (exportedData && exportedData !== exportData()) {
       $('export-file').hidden = true;
@@ -251,19 +272,7 @@
     $('output-warning').hidden = !invalid;
     $('output-warning').textContent = `${plural(invalid, 'entry')} ${invalid === 1 ? 'needs' : 'need'} checking. Only recognised parts appear below; your original text is kept on the left.`;
     $('output-empty').hidden = parts.length > 0;
-    const fragment = document.createDocumentFragment();
-    if (byRunner) P.groupParts(parts).forEach(group => fragment.append(runnerGroup(group, true)));
-    else if (parts.length > 0) project.sections.forEach(section => {
-      const parsed = P.parseParts(section.raw);
-      const root = element('div', 'output-section');
-      const heading = element('div', 'output-section-heading');
-      heading.append(element('h3', '', P.sectionName(section)), element('span', '', plural(parsed.parts.length, 'part')));
-      root.append(heading);
-      if (parsed.parts.length === 0) root.append(element('p', 'empty-section', 'No recognised parts in this section yet.'));
-      P.groupParts(parsed.parts).forEach(group => root.append(runnerGroup(group, false)));
-      fragment.append(root);
-    });
-    $('cutting-list').replaceChildren(fragment);
+    $('cutting-list').replaceChildren(cuttingList(project));
     $('export-toggle').disabled = !parts.length || exportBusy;
     $('export-download').disabled = !parts.length || !!invalid || exportBusy;
     $('save-project').disabled = exportBusy;
@@ -426,6 +435,15 @@
       $('feedback-send').disabled = false;
     }
   });
+  // Bridge for community.js: read the open project, switch projects through the same safe path,
+  // reuse the cutting-list view, and hear about every project switch or save.
+  window.RunnerApp = {
+    project: () => project,
+    library: () => library,
+    projectAction,
+    cuttingList,
+    onChange(listener) { changeListeners.push(listener); }
+  };
   renderProjects();
   renderEditors();
   renderOutput();

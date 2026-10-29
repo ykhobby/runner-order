@@ -277,6 +277,95 @@ footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 3
 .skip-link:focus { top: 12px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
+/* Accounts and navigation */
+.account { display: flex; align-items: center; }
+.utility-button { display: inline-flex; align-items: center; min-height: 34px; padding: 4px 12px; font-family: var(--font-display); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; border-radius: var(--radius); background: transparent; color: var(--on-band); border: 1px solid color-mix(in oklch, var(--on-band) 45%, transparent); cursor: pointer; white-space: nowrap; }
+.utility-button:hover { background: var(--on-band); color: var(--band); }
+.account-menu { position: relative; }
+.account-menu summary { list-style: none; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.account-menu summary::-webkit-details-marker { display: none; }
+.account-menu summary::after { content: "▾"; margin-left: 6px; }
+.account-menu .menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 220px; display: flex; flex-direction: column; padding: 6px; background: var(--surface); color: var(--ink); border: 1.5px solid var(--rule); border-radius: var(--radius); box-shadow: 0 8px 24px color-mix(in oklch, var(--shade) 18%, transparent); }
+.account-menu .menu a, .account-menu .menu button { display: flex; align-items: center; min-height: 40px; padding: 0 10px; border: 0; background: none; color: var(--ink); font: inherit; font-size: 15px; text-align: left; text-decoration: none; border-radius: 2px; }
+.account-menu .menu a:hover, .account-menu .menu button:hover { background: var(--soft); }
+.account-menu .menu .menu-danger { color: var(--danger); border-top: 1px solid var(--line); border-radius: 0; margin-top: 4px; }
+.site-nav { display: flex; gap: 0; margin-bottom: -2px; }
+.site-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; font-family: var(--font-display); font-size: 17px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-decoration: none; border: 1.5px solid transparent; border-bottom: 0; border-radius: var(--radius) var(--radius) 0 0; }
+.site-nav a:hover { color: var(--ink); }
+.site-nav a[aria-current="page"] { color: var(--ink); background: var(--pane); border-color: var(--rule); box-shadow: 0 2px 0 var(--pane); }
+.kit-hint { margin-top: 8px; padding: 6px 10px; font-size: 14px; color: var(--ink); background: var(--soft); border-left: 4px solid var(--accent); }
+.kit-hint .text-button { min-height: 32px; padding: 0 4px; font-size: 14px; }
+footer a { color: inherit; }
+
+/* Dialogs for sign-in, the new-project check and sharing */
+.wide-dialog { width: min(720px, calc(100vw - 32px)); }
+.wide-button { display: flex; width: 100%; justify-content: center; align-items: center; gap: 10px; margin-top: 18px; }
+.wide-button svg { width: 20px; height: 20px; }
+/* Google's mark keeps its own colours; it sits on a white chip so it stays correct in dark themes. */
+.google-mark { padding: 2px; background: #fff; border-radius: 50%; box-sizing: content-box; }
+.or-rule { display: flex; align-items: center; gap: 12px; margin: 18px 0 2px; color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .1em; }
+.or-rule::before, .or-rule::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+.legal-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+.legal-note a { color: var(--accent); }
+.kit-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 14px; margin-top: 14px; }
+.kit-form .field label, .library-filters .field label { margin: 10px 0 6px; }
+.kit-form .wide, .library-filters .wide { grid-column: 1 / -1; }
+.kit-form select, .library-filters select { width: 100%; }
+.kit-form textarea { min-height: 80px; font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.dialog-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.exact-notice { margin-top: 14px; padding: 10px 12px; font-weight: 600; color: var(--on-mark); background: var(--mark); border-radius: 2px; }
+.kit-results { list-style: none; margin: 10px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.kit-results.compact { max-height: 340px; overflow-y: auto; }
+.kit-result { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 2px; border-bottom: 1px solid var(--row-line); }
+.kit-result-text { min-width: 0; }
+.kit-result-title { font-family: var(--font-display); font-size: 19px; font-weight: 700; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.kit-result-title:hover { color: var(--accent); }
+.kit-result-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; flex-shrink: 0; }
+.kit-result-actions .button { min-height: 38px; padding: 6px 12px; font-size: 14px; }
+.kit-meta { font-family: var(--font-display); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
+.kit-stats { font-size: 14px; color: var(--muted); }
+.exact-badge { display: inline-block; margin-bottom: 4px; padding: 2px 7px; font: 700 12px var(--mono); color: var(--on-mark); background: var(--mark); border-radius: 2px; }
+.kit-confirmed { font-size: 14px; font-weight: 600; color: var(--accent); }
+.report-reasons { border: 0; padding: 0; margin: 14px 0 0; }
+.report-reasons legend { font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; font-family: var(--font-display); }
+.report-reason { display: flex; align-items: center; gap: 10px; min-height: 40px; font-family: var(--font-body); font-size: 15px; font-weight: 400; text-transform: none; letter-spacing: 0; cursor: pointer; }
+.report-reason input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+
+/* Community pages */
+.community { padding: 34px 0 10px; }
+.community-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 24px; padding-bottom: 14px; border-bottom: 2px solid var(--rule); }
+.community-head h2 { font-size: 44px; }
+.community-head .pane-description { margin-top: 0; }
+.library-filters { display: grid; grid-template-columns: 2fr repeat(4, minmax(0, 1fr)); gap: 0 14px; margin-top: 16px; }
+.library-filters + .export-status { margin-top: 12px; }
+.kit-grid { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin: 14px 0 0; padding: 0; }
+.kit-card { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 16px; background: var(--pane); color: var(--ink); text-decoration: none; border: 1.5px solid var(--rule); border-radius: var(--radius); }
+.kit-card h3 { font-size: 24px; }
+.kit-card:hover { border-color: var(--accent); box-shadow: 4px 4px 0 var(--accent); }
+.kit-card .kit-stats { margin-top: auto; }
+.load-more { margin: 18px auto 0; display: block; }
+.back-link { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 6px; color: var(--accent); font-family: var(--font-display); font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; text-decoration: none; }
+.kit-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+.kit-head .kit-stats { margin-top: 2px; }
+.kit-notes { max-width: 70ch; margin-top: 6px; color: var(--ink); white-space: pre-line; }
+.kit-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 18px; }
+.kit-pdf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.kit-pdf select { width: auto; min-height: 44px; }
+.kit-sheet { margin-top: 22px; min-height: 0; }
+.kit-sheet > .pane-heading { margin: 0 -26px; padding: 16px 26px; border-bottom: 2px solid var(--rule); }
+.kit-cutting-list { margin-top: 24px; }
+.admin-heading { margin-top: 30px; font-size: 24px; }
+.admin-merge { grid-template-columns: repeat(2, minmax(0, 1fr)) auto; align-items: end; }
+
+/* Privacy and terms pages */
+.legal-page { max-width: 760px; padding-top: 28px; padding-bottom: 56px; }
+.legal-page h1 { font-size: 52px; margin: 4px 0 18px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
+.legal-page h2 { font-size: 26px; margin: 30px 0 10px; }
+.legal-page p, .legal-page li { font-size: 17px; line-height: 1.6; }
+.legal-page ul { padding-left: 22px; }
+.legal-page li + li { margin-top: 6px; }
+.legal-page a:not(.back-link) { color: var(--accent); }
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
@@ -286,6 +375,7 @@ footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 3
   .entry-pane > .pane-heading, .output-pane > .pane-heading { margin: 0 -20px; padding: 16px 20px; }
   h1 { font-size: 52px; }
   .project-file { padding-left: 0; border-left: 0; }
+  .library-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 960px) {
   .workspace { grid-template-columns: minmax(0, 1fr); }
@@ -307,12 +397,20 @@ footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 3
   footer { flex-direction: column; gap: 4px; }
   .brand-bar { flex-direction: column; align-items: stretch; gap: 18px; padding: 22px 0; }
   .brand-links { flex-direction: column; align-items: stretch; }
+  .kit-form, .admin-merge { grid-template-columns: minmax(0, 1fr); }
+  .kit-result { flex-direction: column; align-items: stretch; }
+  .kit-result-actions { justify-content: flex-start; }
+  .community-head h2 { font-size: 36px; }
+  .site-nav a { flex: 1; justify-content: center; padding: 0 8px; }
   .social-links .social-link { flex: 1; justify-content: center; }
   .donate-link { justify-content: center; }
 }
 @media (max-width: 420px) {
   .shell { padding: 0 14px; }
   .utility-bar { flex-wrap: wrap; }
+  .utility-actions { flex-wrap: wrap; }
+  .library-filters { grid-template-columns: minmax(0, 1fr); }
+  .kit-sheet > .pane-heading { margin: 0 -14px; padding: 14px; }
   .save-status { font-size: 12px; }
   .brand-mark { width: 48px; height: 48px; }
   .brand-name { font-size: 36px; }

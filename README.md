@@ -1,6 +1,6 @@
 # Runner Order
 
-A small, offline-capable model kit cutting-list organiser. No accounts, backend, or build tools. The only network request is the optional feedback form, sent when a tester submits it. PDF export uses one locally bundled, free MIT-licensed library (pdf-lib).
+A small, offline-capable model kit cutting-list organiser, with an optional community kit library. The workbench needs no account, backend or build tools and works offline. PDF export uses one locally bundled, free MIT-licensed library (pdf-lib). Network requests happen only for the feedback form and, when switched on, the community library.
 
 ## Run locally
 
@@ -36,6 +36,18 @@ The header links to YK.Hobby on Instagram and Facebook, plus a **Money for backl
 
 To connect it, create a free access key at web3forms.com using the address that should receive feedback, then paste it into `dist/config.js` as `feedbackAccessKey`. Until a key is set, the form explains that feedback isn't connected and sends nothing.
 
+## Community library (optional)
+
+When `dist/config.js` has Supabase settings, the app adds:
+- **Accounts:** "Continue with Google" or an emailed sign-in link.
+- **Cloud saves:** each saved project uploads to the person's account and appears on their other devices. The newest copy wins, and unsaved edits are never overwritten.
+- **Check before you type:** New project asks "What are you building?" and searches the library by name or product code, filtered by brand, scale and line. People can use a match ready-made or start from scratch, and the details they enter carry through to sharing.
+- **Share to community:** checks for similar kits first, then publishes a frozen copy of the part list under CC0.
+- **Community kits** (`#/kits`): search and filter by brand, scale and line; kit pages (`#/kits/<id>`) with a preview, PDF download, "Use this kit", confirmations and reports.
+- **Admin** (`#/admin`): reported kits, merging duplicates, promoting typed-in brands.
+
+Without those settings, none of this appears and the app behaves exactly as before. The sign-in library (supabase-js 2.45.4) loads from jsDelivr only when the feature is on. Setup steps are in `docs/COMMUNITY-SETUP.md`.
+
 ## PDF cutting sheets
 
 Exports use A4 portrait pages with project name, export date, page numbers, runner headings, and a checkbox for every part in runner lists. Section mode follows your custom section order and matches the app's look as a compact build cheat-sheet: each section heading shows its part count, and each runner's code sits beside its outlined part chips (no checkboxes), using up to three columns at the largest text size that fits. Runner mode naturally sorts every part across the whole project and shows its source section. Both includes the section list followed by the runner list in the same PDF.
@@ -53,16 +65,23 @@ Unrecognised entries are highlighted and stay in the original input. Repeated pa
 ## Files
 
 - `dist/index.html`: accessible page structure and local asset loading.
-- `dist/config.js`: deployment settings (the feedback access key).
+- `dist/config.js`: deployment settings: the feedback access key and the optional Supabase address and public key.
 - `dist/styles.css`: light workshop layout, desktop/mobile breakpoints, and interface states.
 - `dist/parts.js`: pure parser, sorting, section operations, project validation, and localStorage helpers.
 - `dist/projects.js`: named project library, safe switching, duplicate-name protection, migration of the existing draft, and project file export/import.
 - `dist/app.js`: editing controls, live cutting views, undo, and immediate browser saving.
 - `dist/export.js`: A4 PDF layout, pagination, download naming, and Unicode name fallback.
+- `dist/cloud.js`: community helpers (kit details, title matching, sharing and "use this kit" copies) and the Supabase wrapper.
+- `dist/community.js`: sign-in, cloud sync, the New project check, sharing, the Community kits pages and admin tools.
+- `dist/privacy.html` / `dist/terms.html`: privacy policy and terms of use.
+- `supabase/migrations/`: database tables, access rules, search and moderation functions.
+- `docs/COMMUNITY-SETUP.md`: switching the community library on.
 - `dist/vendor/pdf-lib.min.js` / `pdf-lib.LICENSE.md`: the bundled PDF library and its MIT license.
 - `tests/parts.test.cjs`: dependency-free logic and storage tests.
 - `tests/projects.test.cjs`: named saving, switching, snapshot isolation, migration, and storage tests.
 - `tests/export.test.cjs`: PDF creation, A4 page sizes, pagination, preservation, and export validation tests.
+- `tests/cloud.test.cjs`: kit sharing, "use this kit", title matching and cloud-merge tests.
+- `tests/sql/`: access-rule tests for the database, run against a throwaway local Postgres with `sh tests/sql/run.sh`.
 - `tests/create-pdf-samples.cjs`: generates sample and stress-test PDFs for visual QA.
 - `PRODUCT.md` / `DESIGN.md`: product and interface decisions.
 

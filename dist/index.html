@@ -24,7 +24,9 @@
   <script src="projects.js" defer></script>
   <script src="vendor/pdf-lib.min.js" defer></script>
   <script src="export.js" defer></script>
+  <script src="cloud.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="community.js" defer></script>
 </head>
 <body>
   <a href="#workspace" class="skip-link">Skip to workspace</a>
@@ -33,6 +35,19 @@
       <div class="utility-bar">
         <div id="save-status" class="save-status" role="status"><span class="status-dot"></span>Saved on this device</div>
         <div class="utility-actions">
+          <div id="account" class="account" hidden>
+            <button id="sign-in-open" class="button secondary utility-button" type="button">Sign in</button>
+            <details id="account-menu" class="account-menu" hidden>
+              <summary id="account-name" class="utility-button">Account</summary>
+              <div class="menu">
+                <a id="admin-link" href="#/admin" hidden>Admin</a>
+                <button id="rename-account" type="button">Change display name</button>
+                <a href="privacy.html">Privacy</a>
+                <button id="sign-out" type="button">Sign out</button>
+                <button id="delete-account" type="button" class="menu-danger">Delete account</button>
+              </div>
+            </details>
+          </div>
           <label for="theme-select" class="sr-only">Colour theme</label>
           <select id="theme-select" class="theme-select" title="Colour theme">
             <option value="auto">Theme: Auto</option>
@@ -58,14 +73,19 @@
           <a class="donate-link" href="https://ko-fi.com/ykhobby" target="_blank" rel="noopener noreferrer" aria-label="Money for backlog: support YK.Hobby on Ko-fi (opens in a new tab)" title="Every builder's backlog needs feeding"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="14" width="16" height="6" rx="1"/><rect x="6" y="8.5" width="12" height="5.5" rx="1"/><rect x="8" y="3.5" width="8" height="5" rx="1"/><path d="M4 17h16M6 11.25h12"/></svg><span>Money for backlog</span></a>
         </div>
       </div>
+      <nav id="site-nav" class="site-nav" aria-label="Pages" hidden>
+        <a id="nav-workbench" href="#">Workbench</a>
+        <a id="nav-kits" href="#/kits">Community kits</a>
+      </nav>
     </header>
+    <div id="workbench">
     <section class="project-header" aria-labelledby="page-title">
       <div><h1 id="page-title">A little order.<br> A better build.</h1><p class="intro">Enter parts in manual order. Cut them in runner order.</p></div>
-      <div class="project-field"><label for="project-name">Kit / project name <span class="optional">optional</span></label><input id="project-name" type="text" placeholder="Name your build" autocomplete="off"></div>
+      <div class="project-field"><label for="project-name">Kit / project name <span class="optional">optional</span></label><input id="project-name" type="text" placeholder="Name your build" autocomplete="off"><p id="kit-hint" class="kit-hint" hidden>This kit may already be in the community library. <button id="kit-hint-open" type="button" class="text-button">View matches</button></p></div>
     </section>
     <section class="project-tools" aria-label="Project management">
       <div class="project-actions"><button id="save-project" class="button primary">Save project</button><button id="new-project" class="button secondary">New project</button></div>
-      <div class="project-file"><button id="export-project" class="button secondary" title="Download this project as a file to back it up, move it to another device, or share it">Export file</button><button id="import-project" class="button secondary" title="Open a project file exported from Runner Order">Import file</button><input id="import-file" type="file" accept=".json,application/json" hidden></div>
+      <div class="project-file"><button id="export-project" class="button secondary" title="Download this project as a file to back it up, move it to another device, or share it">Export file</button><button id="import-project" class="button secondary" title="Open a project file exported from Runner Order">Import file</button><input id="import-file" type="file" accept=".json,application/json" hidden><button id="share-kit" class="button secondary" type="button" hidden>Share to community</button></div>
       <div class="project-picker"><label for="saved-projects">Saved projects</label><select id="saved-projects"><option value="">Choose a project</option></select><button id="open-project" class="button secondary" disabled>Open</button></div>
       <p id="project-status" role="status" aria-live="polite"></p>
     </section>
@@ -108,7 +128,9 @@
         <div id="output-empty" class="output-empty"><div class="sample-parts" aria-hidden="true"><span>A3</span><span>A15</span><span>A16</span></div><h3>Ready when your parts are</h3><p>Your sorted cutting list appears here as you type. Switch views to work by assembly or tackle one whole runner.</p></div>
       </section>
     </main>
-    <footer><span>Built for the workbench.</span><span>Projects are stored in this browser only · Use Export file to back them up</span></footer>
+    </div>
+    <section id="community" class="community" aria-live="polite" hidden></section>
+    <footer><span>Built for the workbench.</span><span id="footer-storage">Projects are stored in this browser only · Use Export file to back them up</span><span id="footer-legal" hidden><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span></footer>
   </div>
   <dialog id="feedback-dialog" class="feedback-dialog" aria-labelledby="feedback-heading">
     <form id="feedback-form" novalidate>
@@ -126,5 +148,77 @@
       <div class="export-actions"><button id="feedback-send" type="submit" class="button primary">Send feedback</button></div>
     </form>
   </dialog>
+  <dialog id="sign-in-dialog" class="feedback-dialog" aria-labelledby="sign-in-heading">
+    <div class="pane-heading"><h2 id="sign-in-heading">Sign in</h2><button type="button" class="text-button" data-close>Close</button></div>
+    <p id="sign-in-reason" class="pane-description">Sign in to keep your projects on every device and share kits with the community.</p>
+    <button id="sign-in-google" class="button secondary wide-button" type="button"><svg class="google-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21 12.2c0-.7-.1-1.3-.2-1.9H12v3.6h5.1a4.4 4.4 0 0 1-1.9 2.9v2.4h3.1c1.8-1.7 2.7-4.1 2.7-7Z"/><path fill="#34A853" d="M12 21.5c2.6 0 4.7-.9 6.3-2.3l-3.1-2.4c-.9.6-2 .9-3.2.9-2.5 0-4.6-1.7-5.3-3.9H3.5v2.5A9.5 9.5 0 0 0 12 21.5Z"/><path fill="#FBBC05" d="M6.7 13.8a5.7 5.7 0 0 1 0-3.6V7.7H3.5a9.5 9.5 0 0 0 0 8.6l3.2-2.5Z"/><path fill="#EA4335" d="M12 6.3c1.4 0 2.6.5 3.6 1.4l2.7-2.7A9.5 9.5 0 0 0 3.5 7.7l3.2 2.5C7.4 8 9.5 6.3 12 6.3Z"/></svg><span>Continue with Google</span></button>
+    <p class="or-rule"><span>or</span></p>
+    <form id="sign-in-email-form" novalidate>
+      <label for="sign-in-email">Email</label>
+      <input id="sign-in-email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254">
+      <div class="export-actions"><button id="sign-in-email-send" class="button primary" type="submit">Email me a sign-in link</button></div>
+    </form>
+    <p id="sign-in-status" class="export-status" role="status" aria-live="polite"></p>
+    <p class="legal-note">By signing in you agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy policy</a>.</p>
+  </dialog>
+  <dialog id="precheck-dialog" class="feedback-dialog wide-dialog" aria-labelledby="precheck-heading">
+    <div class="pane-heading"><h2 id="precheck-heading">What are you building?</h2><button type="button" class="text-button" data-close>Close</button></div>
+    <p class="pane-description">Check the community library first. If someone has already typed this kit in, you can use it straight away.</p>
+    <form id="precheck-form" class="kit-form" novalidate>
+      <div class="field wide"><label for="precheck-query">Kit name or product code</label><input id="precheck-query" type="search" autocomplete="off" placeholder="e.g. Zaku II or 5060661"></div>
+      <div class="field"><label for="precheck-brand">Brand</label><select id="precheck-brand"></select></div>
+      <div class="field"><label for="precheck-scale">Scale</label><select id="precheck-scale"></select></div>
+      <div class="field"><label for="precheck-line">Line <span class="optional">optional</span></label><input id="precheck-line" list="line-options" autocomplete="off" placeholder="HG, RG, MG…"></div>
+    </form>
+    <p id="precheck-exact" class="exact-notice" hidden>This exact kit is already in the library.</p>
+    <p id="precheck-status" class="export-status" role="status" aria-live="polite"></p>
+    <ul id="precheck-results" class="kit-results compact"></ul>
+    <div class="dialog-footer"><button id="precheck-scratch" class="button primary" type="button">Start from scratch</button><button id="precheck-skip" class="text-button" type="button">Skip, just start a blank project</button></div>
+  </dialog>
+  <dialog id="share-dialog" class="feedback-dialog wide-dialog" aria-labelledby="share-heading">
+    <div class="pane-heading"><h2 id="share-heading">Share to community</h2><button type="button" class="text-button" data-close>Close</button></div>
+    <div id="share-duplicates" hidden>
+      <p class="pane-description">These kits look similar. If one matches your build, confirm it instead of sharing a duplicate.</p>
+      <ul id="share-duplicate-list" class="kit-results compact"></ul>
+      <div class="dialog-footer"><button id="share-anyway" class="button primary" type="button">Share mine anyway</button><span class="export-help">For a different version, or corrections</span></div>
+    </div>
+    <form id="share-form" class="kit-form" novalidate hidden>
+      <div class="field wide"><label for="share-title">Kit name</label><input id="share-title" required maxlength="120" autocomplete="off" placeholder="e.g. Zaku II"></div>
+      <div class="field"><label for="share-brand">Brand</label><select id="share-brand"></select></div>
+      <div class="field" id="share-brand-other-field" hidden><label for="share-brand-other">Brand name</label><input id="share-brand-other" maxlength="60" autocomplete="off"></div>
+      <div class="field"><label for="share-scale">Scale</label><select id="share-scale"></select></div>
+      <div class="field"><label for="share-line">Line <span class="optional">optional</span></label><input id="share-line" list="line-options" maxlength="40" autocomplete="off" placeholder="HG, RG, MG…"></div>
+      <div class="field"><label for="share-series">Series <span class="optional">optional</span></label><input id="share-series" maxlength="80" autocomplete="off" placeholder="e.g. Mobile Suit Gundam"></div>
+      <div class="field"><label for="share-code">Product code <span class="optional">optional</span></label><input id="share-code" maxlength="40" autocomplete="off" placeholder="From the box, e.g. 5060661"></div>
+      <div class="field wide"><label for="share-notes">Notes <span class="optional">optional</span></label><textarea id="share-notes" maxlength="1000" placeholder="Anything other builders should know"></textarea></div>
+      <label class="feedback-check wide"><input id="share-licence" type="checkbox"> I agree this part list is free for anyone to use and share.</label>
+      <p id="share-status" class="export-status wide" role="status" aria-live="polite"></p>
+      <div class="dialog-footer wide"><button id="share-submit" class="button primary" type="submit">Share kit</button></div>
+    </form>
+    <div id="share-done" hidden>
+      <p class="pane-description" id="share-done-message">Your kit is in the community library.</p>
+      <div class="dialog-footer"><a id="share-done-view" class="button primary" href="#/kits">View kit</a><button id="share-done-copy" class="button secondary" type="button">Copy link</button></div>
+    </div>
+  </dialog>
+  <dialog id="report-dialog" class="feedback-dialog" aria-labelledby="report-heading">
+    <form id="report-form" novalidate>
+      <div class="pane-heading"><h2 id="report-heading">Report this kit</h2><button type="button" class="text-button" data-close>Close</button></div>
+      <p class="pane-description">Kits reported by three builders are hidden until they are reviewed.</p>
+      <fieldset class="report-reasons"><legend>Reason</legend><div id="report-reasons"></div></fieldset>
+      <label for="report-details">Details <span class="optional">optional</span></label>
+      <textarea id="report-details" maxlength="500"></textarea>
+      <p id="report-status" class="export-status" role="status" aria-live="polite"></p>
+      <div class="export-actions"><button id="report-submit" class="button primary" type="submit">Send report</button></div>
+    </form>
+  </dialog>
+  <dialog id="ask-dialog" class="feedback-dialog" aria-labelledby="ask-heading">
+    <form id="ask-form" method="dialog">
+      <h2 id="ask-heading">Are you sure?</h2>
+      <p id="ask-message" class="pane-description"></p>
+      <div id="ask-input-field" hidden><label for="ask-input" id="ask-input-label">Name</label><input id="ask-input" maxlength="40" autocomplete="off"></div>
+      <div class="export-actions"><button id="ask-yes" class="button primary" value="yes">Yes</button><button id="ask-no" class="button secondary" value="no" formnovalidate>Cancel</button></div>
+    </form>
+  </dialog>
+  <datalist id="line-options"><option value="HG"><option value="RG"><option value="MG"><option value="PG"><option value="SD"><option value="EG"><option value="MGSD"><option value="Full Mechanics"></datalist>
 </body>
 </html>

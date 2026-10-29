@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Terms · Runner Order</title>
+  <link rel="icon" href="apple-touch-icon.png">
+  <script>
+    (function () {
+      var choice = 'auto';
+      try { choice = localStorage.getItem('runner-notes.theme') || 'auto'; } catch (e) {}
+      if (choice === 'crimson') choice = 'char';
+      var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = choice === 'auto' ? (dark ? 'dark' : 'light') : choice;
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell legal-page">
+    <a class="back-link" href="./">← Back to Runner Order</a>
+    <p class="eyebrow">Last updated 29 October 2026</p>
+    <h1>Terms of use</h1>
+    <p>Runner Order is a free hobby tool run by YK.Hobby. By using it you agree to these terms.</p>
+
+    <h2>Sharing kits</h2>
+    <ul>
+      <li>A shared kit contains only its name, details such as brand and scale, and its section names and part numbers.</li>
+      <li>When you share a kit, you dedicate that part list to the public domain under <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener noreferrer">CC0 1.0</a>. Anyone may use, copy and share it, and it may stay in the library if you delete your account.</li>
+      <li>Share only part lists you typed yourself. Never upload or paste scans, photos or text copied from instruction manuals.</li>
+      <li>No offensive, misleading or spam content. Kits reported by several people are hidden automatically, and admins may hide, merge or remove any kit.</li>
+    </ul>
+
+    <h2>Accounts</h2>
+    <ul>
+      <li>You are responsible for activity on your account. We may suspend accounts that misuse the library.</li>
+      <li>You can delete your account at any time from the account menu.</li>
+    </ul>
+
+    <h2>No warranty</h2>
+    <p>Community kits are made by other builders and may contain mistakes. Always check parts against your manual before cutting. Runner Order is provided as is, without any warranty, and may change or stop at any time.</p>
+
+    <h2>Trademarks</h2>
+    <p>Kit, brand and series names belong to their respective owners. Runner Order is an independent fan project and is not affiliated with any model kit manufacturer.</p>
+
+    <p>Questions? Use <strong>Send feedback</strong> on the main page. See also the <a href="privacy.html">Privacy</a> page.</p>
+  </main>
+</body>
+</html>

@@ -108,8 +108,48 @@
     library.activeId = null;
     return { saved, entry: saveCurrent(library) };
   }
+  // Cloud sync: the browser library stays the working copy; each entry's updatedAt decides which copy wins.
+  function uniqueName(library, name, id) {
+    const base = name.trim() || 'Untitled project';
+    let candidate = base, suffix = 2;
+    while (library.projects.some(entry => entry.id !== id && nameKey(entry.project.name) === nameKey(candidate))) candidate = `${base} (${suffix++})`;
+    return candidate;
+  }
+  function projectRow(entry) {
+    return { id: entry.id, name: entry.project.name, data: clone(entry.project), updated_at: entry.updatedAt };
+  }
+  function mergeCloud(library, rows) {
+    const result = { added: [], updated: [], conflicts: [], toUpload: [] };
+    const cloud = new Map();
+    for (const row of rows) {
+      const time = Date.parse(row && row.updated_at);
+      if (!row || typeof row.id !== 'string' || !row.id || Number.isNaN(time) || !P.validateProject(row.data)) continue;
+      cloud.set(row.id, time);
+      const local = library.projects.find(entry => entry.id === row.id);
+      if (local && time <= Date.parse(local.updatedAt)) continue;
+      const project = clone(row.data);
+      project.name = uniqueName(library, project.name, row.id);
+      const updatedAt = new Date(time).toISOString();
+      if (!local) {
+        library.projects.push({ id: row.id, project, updatedAt });
+        result.added.push(project.name);
+        continue;
+      }
+      // An open project with unsaved edits is never replaced underneath the person.
+      if (library.activeId === row.id) {
+        if (JSON.stringify(library.current) !== JSON.stringify(local.project)) { result.conflicts.push(project.name); continue; }
+        library.current = clone(project);
+      }
+      local.project = project;
+      local.updatedAt = updatedAt;
+      result.updated.push(project.name);
+    }
+    result.toUpload = library.projects.filter(entry => !cloud.has(entry.id) || Date.parse(entry.updatedAt) > cloud.get(entry.id))
+      .map(entry => entry.id);
+    return result;
+  }
   const api = { STORAGE_KEY, createLibrary, validateLibrary, loadLibrary, saveLibrary, saveCurrent, startNew, openProject,
-    projectFile, projectFileName, readProjectFile, importProject };
+    projectFile, projectFileName, readProjectFile, importProject, nameKey, uniqueName, projectRow, mergeCloud };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Projects = api;
 })(globalThis);
