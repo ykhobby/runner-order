@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf0e9">
+  <meta name="description" content="A local workbench for organising model kit parts by section or runner.">
+  <title>Runner Order · Model parts organiser</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232d5545'/%3E%3Cg fill='none' stroke='%23edf0e9' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18H55V52H9Z'/%3E%3Cpath d='M9 18V12H21V18' fill='%23edf0e9'/%3E%3Cpath d='M9 35H55M32 18V52' stroke-width='3'/%3E%3Ccircle cx='20.5' cy='26.5' r='3.5'/%3E%3Ccircle cx='43.5' cy='26.5' r='3.5'/%3E%3Ccircle cx='20.5' cy='43.5' r='3.5'/%3E%3Ccircle cx='43.5' cy='43.5' r='3.5'/%3E%3C/g%3E%3C/svg%3E">
+  <script>
+    // Apply the saved colour theme before first paint to avoid a flash of the wrong theme.
+    (function () {
+      var choice = 'auto';
+      try { choice = localStorage.getItem('runner-notes.theme') || 'auto'; } catch (e) {}
+      var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = choice === 'auto' ? (dark ? 'dark' : 'light') : choice;
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js" defer></script>
+  <script src="parts.js" defer></script>
+  <script src="projects.js" defer></script>
+  <script src="vendor/pdf-lib.min.js" defer></script>
+  <script src="export.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a href="#workspace" class="skip-link">Skip to workspace</a>
+  <div class="shell">
+    <header class="masthead">
+      <div class="utility-bar">
+        <div id="save-status" class="save-status" role="status"><span class="status-dot"></span>Saved on this device</div>
+        <div class="utility-actions">
+          <label for="theme-select" class="sr-only">Colour theme</label>
+          <select id="theme-select" class="theme-select" title="Colour theme">
+            <option value="auto">Theme: Auto</option>
+            <option value="light">Workshop</option>
+            <option value="dark">Night shift</option>
+            <option value="tricolour">Tricolour</option>
+            <option value="crimson">Crimson</option>
+          </select>
+          <button id="feedback-open" class="button secondary feedback-button" type="button">Send feedback</button>
+        </div>
+      </div>
+      <div class="brand-bar">
+        <div class="brand">
+          <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M6 14H58V54H6Z"/><path class="brand-tag" d="M6 14V8H20V14"/><path class="brand-gate" d="M6 34H58M32 14V54"/><circle cx="19" cy="24" r="4"/><circle cx="45" cy="24" r="4"/><circle cx="19" cy="44" r="4"/><circle cx="45" cy="44" r="4"/></svg>
+          <div class="brand-text"><span class="brand-name">Runner Order</span><span class="brand-caption">by <strong>YK.Hobby</strong></span></div>
+        </div>
+        <nav class="social-links" aria-label="YK.Hobby on social media">
+          <a class="social-link" href="https://www.instagram.com/yk.hobby/" target="_blank" rel="noopener noreferrer" aria-label="Follow YK.Hobby on Instagram (opens in a new tab)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" class="icon-dot"/></svg><span>Instagram</span></a>
+          <a class="social-link" href="https://www.facebook.com/p/YKhobby-61588069072199/" target="_blank" rel="noopener noreferrer" aria-label="Follow YK.Hobby on Facebook (opens in a new tab)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.6-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.4H9.2v3h2.5V21"/></svg><span>Facebook</span></a>
+        </nav>
+      </div>
+    </header>
+    <section class="project-header" aria-labelledby="page-title">
+      <div><p class="eyebrow">FROM MANUAL TO CUTTING MAT</p><h1 id="page-title">A little order. A better build.</h1><p class="intro">Enter parts in manual order. Cut them in runner order.</p></div>
+      <div class="project-field"><label for="project-name">Kit / project name <span class="optional">optional</span></label><input id="project-name" type="text" placeholder="Name your build" autocomplete="off"></div>
+    </section>
+    <section class="project-tools" aria-label="Project management">
+      <div class="project-actions"><button id="save-project" class="button primary">Save project</button><button id="new-project" class="button secondary">New project</button></div>
+      <div class="project-file"><button id="export-project" class="button secondary" title="Download this project as a file to back it up, move it to another device, or share it">Export file</button><button id="import-project" class="button secondary" title="Open a project file exported from Runner Order">Import file</button><input id="import-file" type="file" accept=".json,application/json" hidden></div>
+      <div class="project-picker"><label for="saved-projects">Saved projects</label><select id="saved-projects"><option value="">Choose a project</option></select><button id="open-project" class="button secondary" disabled>Open</button></div>
+      <p id="project-status" role="status" aria-live="polite"></p>
+    </section>
+    <p id="storage-warning" class="storage-warning" role="alert" hidden></p>
+    <main id="workspace" class="workspace">
+      <section class="entry-pane" aria-labelledby="entry-heading">
+        <div class="pane-heading"><div><p class="eyebrow">01 / ENTER</p><h2 id="entry-heading">Your sections <span id="section-count" class="count">0</span></h2></div><button id="add-section" class="button primary"><span aria-hidden="true">+</span> Add section</button></div>
+        <p class="pane-description">Name assemblies your way, then type or paste their parts.</p>
+        <a href="#output-heading" class="mobile-jump">Go to cutting list ↓</a>
+        <details class="format-guide"><summary>Part formats <span class="guide-preview">A15 · B1-12</span></summary><div><p>Separate parts with spaces, commas, or new lines.</p><p><code>A15 A3, B12</code></p><p>For runners with numbers, use <code>B1-12</code>, <code>B1:12</code>, or <code>B1 12</code>. <code>B112</code> means runner B, part 112. Letter case does not matter.</p></div></details>
+        <div id="sections"></div>
+        <div id="entry-empty" class="entry-empty"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8v48M50 8v48M14 20h36M14 44h36M32 20v24"/><rect x="25" y="25" width="14" height="14" rx="3"/></svg><h3>Start with your first section</h3><p>A section can be any assembly or group from your manual. You choose the names.</p><button id="add-first-section" class="button secondary">+ Add a section</button></div>
+        <div id="deletion-notice" class="deletion-notice" hidden><span id="deletion-message" role="status"></span><button id="undo-delete" class="text-button">Undo</button></div>
+      </section>
+      <section class="output-pane" aria-labelledby="output-heading">
+        <div class="pane-heading"><div><p class="eyebrow">02 / ORGANISE</p><h2 id="output-heading">Cutting list</h2></div><span id="part-count" class="part-count">0 parts</span></div>
+        <div class="view-toggle" role="group" aria-label="Cutting list view"><button id="view-section" aria-pressed="true">By Section</button><button id="view-runner" aria-pressed="false">By Runner</button></div>
+        <p id="view-description" class="pane-description">One assembly at a time. Parts sorted within each section.</p>
+        <a href="#entry-heading" class="mobile-jump">Back to section inputs ↑</a>
+        <p id="output-warning" class="output-warning" hidden></p>
+        <div class="export-bar"><button id="export-toggle" class="button secondary" aria-expanded="false" aria-controls="export-options">Export PDF</button><span>A4 cutting sheet</span></div>
+        <form id="export-options" class="export-options" hidden>
+          <fieldset><legend>Include in your PDF</legend><div class="export-choices">
+            <label><input type="radio" name="export-mode" value="section" checked> By Section</label>
+            <label><input type="radio" name="export-mode" value="runner"> By Runner</label>
+            <label><input type="radio" name="export-mode" value="both"> Both</label>
+          </div></fieldset>
+          <fieldset class="page-options"><legend>A4 pages</legend><div class="export-choices">
+            <label><input type="radio" name="export-pages" value="1" checked> 1 page</label>
+            <label><input type="radio" name="export-pages" value="2"> 2 pages</label>
+            <label><input type="radio" name="export-pages" value="3"> 3 pages</label>
+          </div></fieldset>
+          <p class="export-help">One PDF, fitted to your chosen A4 page count. Choose 2 or 3 pages for larger text and more space.</p>
+          <p id="export-warning" class="parse-error" hidden></p>
+          <div class="export-actions"><button id="export-download" type="submit" class="button primary">Download PDF</button><button id="export-cancel" type="button" class="text-button">Cancel</button></div>
+        </form>
+        <p id="export-status" class="export-status" role="status" aria-live="polite"></p>
+        <a id="export-file" class="export-file" hidden>Save the generated PDF</a>
+        <div id="cutting-list"></div>
+        <div id="output-empty" class="output-empty"><div class="sample-parts" aria-hidden="true"><span>A3</span><span>A15</span><span>A16</span></div><h3>Ready when your parts are</h3><p>Your sorted cutting list appears here as you type. Switch views to work by assembly or tackle one whole runner.</p></div>
+      </section>
+    </main>
+    <footer><span>Built for the workbench.</span><span>Projects are stored in this browser only · Use Export file to back them up</span></footer>
+  </div>
+  <dialog id="feedback-dialog" class="feedback-dialog" aria-labelledby="feedback-heading">
+    <form id="feedback-form" novalidate>
+      <div class="pane-heading"><h2 id="feedback-heading">Send feedback</h2><button id="feedback-close" type="button" class="text-button">Close</button></div>
+      <p class="pane-description">Found a bug or have an idea? Tell us what happened and what you expected.</p>
+      <label for="feedback-message">Your feedback</label>
+      <textarea id="feedback-message" name="message" required maxlength="5000" placeholder="What worked, what didn't, what you'd change…"></textarea>
+      <label for="feedback-name">Name</label>
+      <input id="feedback-name" name="name" type="text" required maxlength="100" autocomplete="name" placeholder="Your name">
+      <label for="feedback-email">Email <span class="optional">so we can reply</span></label>
+      <input id="feedback-email" name="email" type="email" required maxlength="254" autocomplete="email" placeholder="you@example.com">
+      <label class="feedback-check"><input id="feedback-project" type="checkbox"> Attach my current project so the problem can be reproduced</label>
+      <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" aria-hidden="true">
+      <p id="feedback-status" class="export-status" role="status" aria-live="polite"></p>
+      <div class="export-actions"><button id="feedback-send" type="submit" class="button primary">Send feedback</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

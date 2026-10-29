@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# Generated PDFs and local QA output
+output/
+tmp/
