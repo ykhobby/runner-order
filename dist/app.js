@@ -361,6 +361,7 @@
   const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
   let themeChoice = 'auto';
   try { themeChoice = localStorage.getItem(THEME_KEY) || 'auto'; } catch { /* storage unavailable: use auto */ }
+  if (themeChoice === 'crimson') themeChoice = 'char'; // renamed theme; older saved choices carry over
   if (![...$('theme-select').options].some(option => option.value === themeChoice)) themeChoice = 'auto';
   function applyTheme() {
     document.documentElement.dataset.theme = themeChoice === 'auto' ? (darkQuery.matches ? 'dark' : 'light') : themeChoice;

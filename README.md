@@ -28,7 +28,7 @@ Always use the same browser/profile and address to return to your saved work. St
 
 ## Themes and links
 
-The header links to YK.Hobby on Instagram and Facebook (opening in a new tab) and has a colour theme picker: **Auto** (follows the device's light/dark setting), **Workshop** (light green), **Night shift** (dark green), **Tricolour** (light blue) and **Crimson** (dark red). The choice is remembered in this browser under `runner-notes.theme` and applied before the page paints.
+The header links to YK.Hobby on Instagram and Facebook, plus a **Money for backlog** button to YK.Hobby's Ko-fi page (https://ko-fi.com/ykhobby), all opening in a new tab. It also has a colour theme picker: **Auto** (follows the device's light/dark setting), **Default** (light, brand green), **Dark mode**, **RX-78-2** (white, grey, blue, red and yellow), **Char** (dark red) and **Strike Rouge** (rose pink and white). The choice is remembered in this browser under `runner-notes.theme` and applied before the page paints.
 
 ## Feedback
 
