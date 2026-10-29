@@ -223,10 +223,11 @@
     // The Runner Order mark: a runner frame with its letter tag, drawn on a 64-unit grid.
     function logo(x, top, width) {
       const scale = width / 64, line = { borderColor: accent, borderLineCap: 1, scale };
-      page.drawSvgPath('M6 14H58V54H6Z', { x, y: top, borderWidth: 4, ...line });
-      page.drawSvgPath('M6 14V8H20V14Z', { x, y: top, color: accent, borderWidth: 4, ...line });
+      page.drawSvgPath('M6 14H58V54H6Z', { x, y: top, borderWidth: 3.5, ...line });
+      page.drawSvgPath('M6 14V8H20V14Z', { x, y: top, color: accent, borderWidth: 3.5, ...line });
       page.drawSvgPath('M6 34H58M32 14V54', { x, y: top, borderWidth: 2.5, ...line });
-      for (const [cx, cy] of [[19, 24], [45, 24], [19, 44], [45, 44]]) page.drawCircle({ x: x + cx * scale, y: top - cy * scale, size: 4 * scale, borderColor: accent, borderWidth: 4 * scale });
+      page.drawSvgPath('M19 28V34M45 28V34M19 40V34M45 40V34', { x, y: top, borderWidth: 2, ...line });
+      for (const [cx, cy] of [[19, 24], [45, 24], [19, 44], [45, 44]]) page.drawCircle({ x: x + cx * scale, y: top - cy * scale, size: 4 * scale, borderColor: accent, borderWidth: 3.5 * scale });
     }
     function checkbox(x, top) {
       page.drawRectangle({ x, y: top - size * .8, width: size * .65, height: size * .65, borderWidth: Math.max(.15, size * .045), borderColor: muted });

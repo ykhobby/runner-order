@@ -65,9 +65,10 @@ h3 { font-size: 18px; font-weight: 600; }
 .utility-actions { display: flex; align-items: center; gap: 8px; }
 .brand-bar { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 26px 0; }
 .brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
-.brand-mark { width: 56px; height: 56px; flex-shrink: 0; fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.brand-mark { width: 56px; height: 56px; flex-shrink: 0; fill: none; stroke: var(--accent); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
 .brand-mark .brand-tag { fill: var(--accent); }
 .brand-mark .brand-gate { stroke-width: 2.5; }
+.brand-mark .brand-gate-link { stroke-width: 2; }
 .brand-text { display: flex; flex-direction: column; min-width: 0; }
 .brand-name { font-size: 34px; line-height: 1.05; font-weight: 750; letter-spacing: -.035em; }
 .brand-caption { margin-top: 4px; font-size: 14px; color: var(--muted); }
