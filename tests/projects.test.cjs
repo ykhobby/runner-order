@@ -51,9 +51,13 @@ test('does not overwrite another build with the same normalised name', () => {
   const library = populated('Build A'); L.saveCurrent(library); L.startNew(library);
   library.current.name = ' build a '; P.addSection(library.current).raw = 'A99';
   assert.throws(() => L.saveCurrent(library), /already exists/);
-  assert.throws(() => L.startNew(library), /already exists/);
   assert.equal(library.projects.length, 1);
   assert.equal(library.current.sections[0].raw, 'A99');
+  // Switching away saves the clashing draft under a numbered name; the original build is untouched.
+  const saved = L.startNew(library);
+  assert.equal(saved.project.name, 'build a (2)');
+  assert.equal(library.projects.length, 2);
+  assert.equal(library.projects[0].project.name, 'Build A');
   library.current.name = '';
   assert.throws(() => L.saveCurrent(library), /Enter a project name/);
 });
@@ -98,4 +102,14 @@ test('rejects files that are not valid project files', () => {
   assert.throws(() => L.readProjectFile('{"format":"runner-notes.project","version":1,"project":{}}'), /damaged/);
   assert.throws(() => L.readProjectFile('{"format":"runner-notes.project","version":2}'), /newer version/);
   assert.throws(() => L.readProjectFile('x'.repeat(6 * 1024 * 1024)), /too large/);
+});
+test('switching projects numbers a clashing name instead of blocking the switch', () => {
+  const library = populated('MG Zaku II'); L.saveCurrent(library);
+  L.startNew(library);
+  library.current.name = 'mg zaku ii';
+  const saved = L.startNew(library);
+  assert.equal(saved.project.name, 'mg zaku ii (2)');
+  assert.equal(library.projects.length, 2);
+  library.current.name = 'MG Zaku II';
+  assert.throws(() => L.saveCurrent(library), /already exists/, 'an explicit save still asks for a different name');
 });

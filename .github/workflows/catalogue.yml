@@ -1,0 +1,37 @@
+# Weekly refresh of the Bandai kit catalogue from gunpla.fyi (github.com/stevenla/gunpla-db, used with permission).
+# Commits dist/catalogue.json only when the kit list changed, then redeploys the site.
+name: Refresh kit catalogue
+
+on:
+  schedule:
+    - cron: '0 18 * * 0' # Mondays 4am / 5am Sydney time
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/import-catalogue.mjs
+      - run: node --test tests/*.test.cjs
+      - name: Commit and redeploy if the catalogue changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet dist/catalogue.json; then
+            echo "No catalogue changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Refresh kit catalogue from gunpla.fyi" dist/catalogue.json
+          git push
+          # Pushes made with this token don't trigger other workflows, so start the deploy directly.
+          gh workflow run pages.yml --ref main

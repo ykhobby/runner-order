@@ -12,6 +12,7 @@ Do it twice if you want to be careful: a **staging** project to test with, then 
    - **Database password:** generate a strong one and save it in your password manager.
 3. When the project is ready, open **SQL Editor → New query**.
 4. Paste the whole of `supabase/migrations/20261029000000_community.sql` and click **Run**. You should see "Success. No rows returned".
+5. Open a new query, paste `supabase/migrations/20261030000000_catalogue.sql` and run it too. It adds the "parts list available" counts for the kit catalogue.
 
 ## 2. Allow the website to sign people in
 In **Authentication → URL Configuration**:

@@ -90,11 +90,11 @@
   function kitLink(id, base) {
     return `${String(base).replace(/#.*$/, '')}#/kits/${id}`;
   }
-  // Hash routes: #/kits, #/kits/<id>, #/admin. Anything else is the workbench.
+  // Hash routes: #/kits, #/kits/<id>, #/catalogue, #/admin. Anything else is the workbench.
   function parseRoute(hash) {
-    const match = String(hash || '').match(/^#\/(kits|admin)(?:\/([0-9a-f-]{36}))?\/?$/i);
+    const match = String(hash || '').match(/^#\/(kits|admin|catalogue)(?:\/([0-9a-f-]{36}))?\/?$/i);
     if (!match) return { page: 'workbench' };
-    if (match[1].toLowerCase() === 'admin') return { page: 'admin' };
+    if (match[1].toLowerCase() !== 'kits') return { page: match[1].toLowerCase() };
     return match[2] ? { page: 'kit', id: match[2].toLowerCase() } : { page: 'kits' };
   }
 
@@ -122,6 +122,10 @@
       listProjects() { return data(client.from('projects').select('id,name,data,updated_at')); },
       uploadProjects(rows) { return rows.length ? data(client.from('projects').upsert(rows, { onConflict: 'owner,id' })) : Promise.resolve([]); },
       brands() { return data(client.from('brands').select('slug,name').order('sort').order('name')); },
+      // Product code -> number of published parts lists, for the catalogue's "parts list available" labels.
+      async kitCodeCounts() {
+        return new Map((await data(client.rpc('kit_code_counts'))).map(row => [row.product_key, row.kits]));
+      },
       searchKits({ query = '', brand = null, scale = null, line = null, sort = 'relevance', limit = 30, offset = 0 } = {}) {
         return data(client.rpc('search_kits', { q: query, p_brand: brand || null, p_scale: scale || null, p_line: clean(line) || null,
           p_sort: sort, p_limit: limit, p_offset: offset }));

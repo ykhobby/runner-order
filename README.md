@@ -22,7 +22,7 @@ Always use the same browser/profile and address to return to your saved work. St
 2. Type or paste parts into each section. Inputs stay editable and save immediately.
 3. Rename a section by editing its name. Use the arrows to reorder sections; delete a section with the trash button. The most recent deletion can be undone until the page reloads or another deletion replaces it.
 4. Switch between **By Section** (one assembly at a time) and **By Runner** (all sections combined, with a source section beside each part).
-5. Use **Save project** to keep the current inputs under that name. Choose a saved project and click **Open** to return to it, or **New project** to start a blank build. Starting or opening a project saves the current build first. Unnamed builds receive an “Untitled project” name. Duplicate names cannot overwrite a different saved build.
+5. Use **Save project** to keep the current inputs under that name. Choose a saved project and click **Open** to return to it, or **New project** to start a blank build. Starting or opening a project saves the current build first. Unnamed builds receive an “Untitled project” name. Duplicate names cannot overwrite a different saved build: Save project asks for a different name, and switching projects saves a clashing draft under a numbered name such as "Gus (2)".
 6. Use **Export file** to download the current project as a `.json` file, as a backup or to move it to another browser or device. **Import file** opens such a file as a new saved project (the current build is saved first, and a clashing name becomes e.g. “ZZA Gus (2)”, so nothing is overwritten).
 7. Click **Export PDF**, choose **By Section**, **By Runner**, or **Both**, select **1 page**, **2 pages**, or **3 pages**, then **Download PDF**. These choices are independent of the on-screen view.
 
@@ -35,6 +35,14 @@ The header links to YK.Hobby on Instagram and Facebook, plus a **Money for backl
 **Send feedback** (top right) opens a short form: message, name, and email (all required; the email must look like `you@example.com`), plus an optional attachment of the current project file. Replying to a feedback email goes straight to the tester. Submissions are posted to [Web3Forms](https://web3forms.com), which emails them to the inbox the access key was created with.
 
 To connect it, create a free access key at web3forms.com using the address that should receive feedback, then paste it into `dist/config.js` as `feedbackAccessKey`. Until a key is set, the form explains that feedback isn't connected and sends nothing.
+
+## Kit catalogue
+
+The **Kit / project name** box suggests matching kits as you type, from a catalogue of about 2,700 Bandai kits. Typing "zaku ii", "aile strike" or a product code such as `2001365` all work. Picking one names the project (e.g. "MG Zaku II Ver. 2.0") and remembers its brand, grade, scale and product code, which carry through to sharing. Suggestions work offline and without an account.
+
+The catalogue comes from [gunpla.fyi](https://gunpla.fyi) ([stevenla/gunpla-db](https://github.com/stevenla/gunpla-db)) and is used with the owner's permission. Only facts are copied: names, grade, scale, product code, release month and series, never box art. `node scripts/import-catalogue.mjs` rebuilds `dist/catalogue.json`. The "Refresh kit catalogue" workflow does this every Monday morning (Sydney time), committing and redeploying only when the list changed.
+
+When the community library is on, every suggestion also shows "N parts lists" or "No parts list yet". The New project check lists catalogue kits under the shared parts lists, and a **Kit catalogue** page (`#/catalogue`) lets people filter by grade, scale and whether a parts list exists.
 
 ## Community library (optional)
 
@@ -71,6 +79,9 @@ Unrecognised entries are highlighted and stay in the original input. Repeated pa
 - `dist/projects.js`: named project library, safe switching, duplicate-name protection, migration of the existing draft, and project file export/import.
 - `dist/app.js`: editing controls, live cutting views, undo, and immediate browser saving.
 - `dist/export.js`: A4 PDF layout, pagination, download naming, and Unicode name fallback.
+- `dist/catalogue.js`: builds the kit catalogue from gunpla.fyi's data, and searches it.
+- `dist/catalogue.json`: the generated catalogue (refresh with `node scripts/import-catalogue.mjs`).
+- `dist/kit-picker.js`: kit-name suggestions on the workbench.
 - `dist/cloud.js`: community helpers (kit details, title matching, sharing and "use this kit" copies) and the Supabase wrapper.
 - `dist/community.js`: sign-in, cloud sync, the New project check, sharing, the Community kits pages and admin tools.
 - `dist/privacy.html` / `dist/terms.html`: privacy policy and terms of use.
@@ -80,6 +91,7 @@ Unrecognised entries are highlighted and stay in the original input. Repeated pa
 - `tests/parts.test.cjs`: dependency-free logic and storage tests.
 - `tests/projects.test.cjs`: named saving, switching, snapshot isolation, migration, and storage tests.
 - `tests/export.test.cjs`: PDF creation, A4 page sizes, pagination, preservation, and export validation tests.
+- `tests/catalogue.test.cjs`: catalogue naming, grade and scale parsing, and search.
 - `tests/cloud.test.cjs`: kit sharing, "use this kit", title matching and cloud-merge tests.
 - `tests/sql/`: access-rule tests for the database, run against a throwaway local Postgres with `sh tests/sql/run.sh`.
 - `tests/create-pdf-samples.cjs`: generates sample and stress-test PDFs for visual QA.

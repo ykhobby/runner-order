@@ -60,9 +60,11 @@
     library.activeId = entry.id;
     return entry;
   }
+  // Switching projects saves the open one first; a name clash there gets a number instead of blocking the switch.
   function preserveCurrent(library) {
-    if (library.current.name.trim() || library.current.sections.length) return saveCurrent(library, true);
-    return null;
+    if (!library.current.name.trim() && !library.current.sections.length) return null;
+    if (library.current.name.trim()) library.current.name = uniqueName(library, library.current.name, library.activeId);
+    return saveCurrent(library, true);
   }
   function startNew(library) {
     const saved = preserveCurrent(library);

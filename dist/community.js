@@ -19,6 +19,12 @@
   let profile = null;
   let syncedFor = null;
   let brands = C.BRANDS;
+  const K = window.Catalogue;
+  const Picker = window.KitPicker;
+  // Product code -> number of shared parts lists, used to label catalogue kits.
+  let codeCounts = new Map();
+  const listsFor = entry => (entry.codeKey && codeCounts.get(entry.codeKey)) || 0;
+  const listsLabel = count => count ? plural(count, 'parts list') : 'No parts list yet';
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -284,13 +290,26 @@
       return;
     }
     if (token !== searchToken) return;
+    // Matching Bandai catalogue kits that aren't already covered by a shared parts list above.
+    let catalogue = [];
+    const brand = $('precheck-brand').value;
+    if (Picker && (!brand || brand === 'bandai')) {
+      try {
+        const shown = new Set(rows.map(row => C.normaliseCode(row.product_code)).filter(Boolean));
+        catalogue = K.searchCatalogue(await Picker.load(), query, { line: $('precheck-line').value, scale: $('precheck-scale').value, limit: 6 })
+          .filter(entry => !shown.has(entry.codeKey));
+      } catch { catalogue = []; }
+      if (token !== searchToken) return;
+    }
     $('precheck-exact').hidden = !rows.some(row => row.exact_code);
-    $('precheck-status').textContent = rows.length ? `${plural(rows.length, 'match', 'matches')} in the library.`
+    $('precheck-status').textContent = rows.length || catalogue.length
+      ? [rows.length && `${plural(rows.length, 'shared parts list')}`, catalogue.length && `${plural(catalogue.length, 'catalogue kit')}`].filter(Boolean).join(' and ') + '.'
       : 'No matches yet. Start from scratch, then share it when you\'re done so the next builder can skip the typing.';
+    const seeLists = entry => { $('precheck-query').value = entry.code; runPrecheck(); };
     $('precheck-results').replaceChildren(...rows.map(kit => kitResult(kit, [
       button('Use this kit', 'button primary', () => useKit(kit.id)),
       button('Preview', 'button secondary', () => { $('precheck-dialog').close(); location.hash = `#/kits/${kit.id}`; })
-    ])));
+    ])), ...(catalogue.length ? [element('li', 'results-heading', 'From the kit catalogue')] : []), ...catalogue.map(entry => catalogueResult(entry, seeLists, precheckMode !== 'new')));
   }
   const runPrecheckSoon = debounce(runPrecheck, 250);
   $('precheck-form').addEventListener('input', runPrecheckSoon);
@@ -326,16 +345,53 @@
   }
 
   // A gentle hint for people who skipped the check: shown while an empty project's name matches a shared kit.
+  // A kit picked from the catalogue is matched by product code; anything else by name.
   const checkName = debounce(async () => {
     const name = App.project().name.trim();
     if (name.length < 3 || P.projectParts(App.project()).length || !cloud) { $('kit-hint').hidden = true; return; }
+    const kit = App.project().kit || {};
+    const count = kit.productCode ? codeCounts.get(C.normaliseCode(kit.productCode)) || 0 : 0;
+    if (count) {
+      $('kit-hint-text').textContent = `${plural(count, 'community parts list')} already ${count === 1 ? 'exists' : 'exist'} for this kit.`;
+      $('kit-hint-open').dataset.query = kit.productCode;
+      $('kit-hint').hidden = false;
+      return;
+    }
     try {
       const rows = await cloud.searchKits({ query: name, limit: 3 });
+      $('kit-hint-text').textContent = 'This kit may already be in the community library.';
+      $('kit-hint-open').dataset.query = name;
       $('kit-hint').hidden = !rows.length || App.project().name.trim() !== name;
     } catch { $('kit-hint').hidden = true; }
   }, 600);
   $('project-name').addEventListener('input', checkName);
-  $('kit-hint-open').addEventListener('click', () => openPrecheck('hint', App.project().name.trim()));
+  $('kit-hint-open').addEventListener('click', () => openPrecheck('hint', $('kit-hint-open').dataset.query || App.project().name.trim()));
+  // A catalogue kit becomes a new project (from New project) or fills in the open one (from the hint).
+  function startFromEntry(entry, fromHint) {
+    $('precheck-dialog').close();
+    const name = K.projectName(entry);
+    if (App.projectAction(next => {
+      const saved = fromHint ? null : L.startNew(next);
+      next.current.name = name;
+      next.current.kit = { ...(fromHint && next.current.kit || {}), ...K.kitFromEntry(entry) };
+      return saved;
+    }, saved => `${saved ? `Saved "${saved.project.name}". ` : ''}Started ${name}. Share it when you're done so the next builder can skip the typing.`)) {
+      location.hash = '';
+      $('project-name').focus();
+    }
+  }
+  function catalogueResult(entry, onLists, fromHint = false) {
+    const count = listsFor(entry);
+    const item = element('li', 'kit-result catalogue-result');
+    const text = element('div', 'kit-result-text');
+    text.append(element('p', 'kit-result-title', K.projectName(entry)), element('p', 'kit-meta', K.entryMeta(entry)),
+      element('p', `kit-stats${count ? ' has-list' : ''}`, [listsLabel(count), entry.code && `Product code ${entry.code}`].filter(Boolean).join(' · ')));
+    const actions = element('div', 'kit-result-actions');
+    actions.append(count ? button(count === 1 ? 'See parts list' : 'See parts lists', 'button primary', () => onLists(entry))
+      : button(fromHint ? 'Use these details' : 'Start this kit', 'button secondary', () => startFromEntry(entry, fromHint)));
+    item.append(text, actions);
+    return item;
+  }
 
   // ---------------------------------------------------------------- Share to community
   let shareDetails = null;
@@ -412,6 +468,7 @@
       return L.saveCurrent(next);
     }, () => `Shared "${details.title}" to the community library.`);
     if (!saved) App.project().kit = kit;
+    loadCounts();
     $('share-done-message').textContent = `"${details.title}" is in the community library. Anyone can now find it, use it, and print a cutting sheet.`;
     $('share-done-view').href = `#/kits/${id}`;
     $('share-done-copy').dataset.link = C.kitLink(id, location.href);
@@ -435,7 +492,7 @@
     const changedPage = page.hidden === onCommunity;
     $('workbench').hidden = onCommunity;
     page.hidden = !onCommunity;
-    for (const [link, active] of [[$('nav-workbench'), !onCommunity], [$('nav-kits'), onCommunity]]) {
+    for (const [link, active] of [[$('nav-workbench'), !onCommunity], [$('nav-kits'), onCommunity && target.page !== 'catalogue'], [$('nav-catalogue'), target.page === 'catalogue']]) {
       if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
     }
     if (!onCommunity) return;
@@ -443,6 +500,7 @@
     const token = ++renderToken;
     if (target.page === 'kits') renderLibrary(token);
     else if (target.page === 'kit') renderKit(target.id, token);
+    else if (target.page === 'catalogue') renderCatalogue(token);
     else renderAdmin(token);
   }
   window.addEventListener('hashchange', route);
@@ -488,7 +546,9 @@
     message.setAttribute('role', 'status');
     const grid = element('ul', 'kit-grid');
     const more = button('Load more', 'button secondary load-more', () => load(false));
-    page.replaceChildren(pageHeading('Community', 'Community kits', 'Kits typed in by other builders. Use one to skip the typing, then print your cutting sheet.'), form, message, grid, more);
+    const toCatalogue = element('a', 'back-link', 'Browse every Bandai kit in the catalogue →');
+    toCatalogue.href = '#/catalogue';
+    page.replaceChildren(pageHeading('Community', 'Community kits', 'Kits typed in by other builders. Use one to skip the typing, then print your cutting sheet.'), form, message, grid, more, toCatalogue);
     async function load(reset) {
       if (reset) Object.assign(libraryState, { query: search.value.trim(), brand: brand.value, scale: scale.value, line: line.value.trim(), sort: sort.value, offset: 0, rows: [], done: false });
       const mine = ++renderToken;
@@ -614,6 +674,74 @@
     page.replaceChildren(back, head, ...notices, actions, pdf, sheet);
   }
 
+  // The full Bandai catalogue, showing which kits already have a shared parts list.
+  const catalogueState = { query: '', line: '', scale: '', lists: '', shown: 50 };
+  async function renderCatalogue(token) {
+    page.replaceChildren(pageHeading('Catalogue', 'Kit catalogue'), element('p', 'export-status', 'Loading the catalogue…'));
+    let entries;
+    try { entries = await Picker.load(); } catch (error) { offline(token, error.message); return; }
+    await loadCounts();
+    if (token !== renderToken) return;
+    const form = element('form', 'library-filters');
+    form.noValidate = true;
+    const field = (label, control, wide) => {
+      const wrap = element('div', `field${wide ? ' wide' : ''}`);
+      wrap.append(Object.assign(element('label', '', label), { htmlFor: control.id }), control);
+      return wrap;
+    };
+    const search = Object.assign(element('input'), { id: 'catalogue-query', type: 'search', placeholder: 'Kit name or product code', value: catalogueState.query, autocomplete: 'off' });
+    const lineCounts = new Map();
+    for (const entry of entries) if (entry.line) lineCounts.set(entry.line, (lineCounts.get(entry.line) || 0) + 1);
+    const line = Object.assign(element('select'), { id: 'catalogue-line' });
+    fillSelect(line, [...lineCounts].sort((a, b) => b[1] - a[1]).map(([value]) => [value, value]), 'Any grade');
+    line.value = catalogueState.line;
+    const scale = Object.assign(element('select'), { id: 'catalogue-scale' });
+    fillSelect(scale, C.SCALES, 'Any scale');
+    scale.value = catalogueState.scale;
+    const lists = Object.assign(element('select'), { id: 'catalogue-lists' });
+    fillSelect(lists, [['has', 'Has a parts list'], ['needs', 'Needs a parts list']], 'All kits');
+    lists.value = catalogueState.lists;
+    form.append(field('Search', search, true), field('Grade', line), field('Scale', scale), field('Parts list', lists));
+    const message = element('p', 'export-status');
+    message.setAttribute('role', 'status');
+    const list = element('ul', 'kit-results');
+    const more = button('Show more', 'button secondary load-more', () => { catalogueState.shown += 50; paint(); });
+    const credit = element('p', 'legal-note');
+    credit.append(document.createTextNode('Catalogue data from '), Object.assign(element('a', '', 'gunpla.fyi'), { href: 'https://gunpla.fyi', target: '_blank', rel: 'noopener noreferrer' }),
+      document.createTextNode(', used with permission. Updated weekly.'));
+    page.replaceChildren(pageHeading('Catalogue', 'Kit catalogue', `${entries.length.toLocaleString('en')} Bandai kits. See which ones already have a parts list, or be the first to add one.`),
+      form, message, list, more, credit);
+    const viewLists = entry => { Object.assign(libraryState, { query: entry.code, brand: '', scale: '', line: '', rows: [], offset: 0 }); location.hash = '#/kits'; };
+    function matches() {
+      const query = catalogueState.query;
+      const found = query ? K.searchCatalogue(entries, query, { line: catalogueState.line, scale: catalogueState.scale, limit: entries.length })
+        : entries.filter(entry => (!catalogueState.line || entry.line === catalogueState.line) && (!catalogueState.scale || entry.scale === catalogueState.scale));
+      if (catalogueState.lists === 'has') return found.filter(listsFor);
+      if (catalogueState.lists === 'needs') return found.filter(entry => !listsFor(entry));
+      return found;
+    }
+    function paint() {
+      const found = matches();
+      list.replaceChildren(...found.slice(0, catalogueState.shown).map(entry => catalogueResult(entry, viewLists)));
+      message.textContent = found.length ? `${plural(found.length, 'kit')}${found.length > catalogueState.shown ? `, showing ${catalogueState.shown}` : ''}.` : 'No kits match.';
+      more.hidden = found.length <= catalogueState.shown;
+    }
+    const update = debounce(() => {
+      Object.assign(catalogueState, { query: search.value.trim(), line: line.value, scale: scale.value, lists: lists.value, shown: 50 });
+      paint();
+    }, 200);
+    form.addEventListener('input', update);
+    form.addEventListener('change', update);
+    form.addEventListener('submit', event => { event.preventDefault(); update(); });
+    paint();
+  }
+
+  async function loadCounts() {
+    if (!(await ready)) return;
+    try { codeCounts = await cloud.kitCodeCounts(); } catch { return; }
+    if (Picker) Picker.setStatus(entry => entry.codeKey ? listsLabel(listsFor(entry)) : '');
+  }
+
   // Reports
   let reportKit = null;
   $('report-reasons').append(...C.REPORT_REASONS.map(([value, label], index) => {
@@ -726,6 +854,7 @@
   ready.then(async client => {
     if (!client) { $('sign-in-open').title = cloudError; return; }
     client.brands().then(list => { if (list.length) { brands = list; fillBrandsAndScales(); } }).catch(() => {});
+    loadCounts();
     // Supabase recommends leaving its callback before doing more work with the client.
     client.onAuthChange((event, session) => setTimeout(() => setUser(session ? session.user : null), 0));
     try { const session = await client.session(); await setUser(session ? session.user : null); } catch { /* stay signed out */ }

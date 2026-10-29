@@ -165,7 +165,17 @@ input, textarea { width: 100%; border: 1.5px solid var(--line); background: var(
 input:hover, textarea:hover, select:hover { border-color: var(--muted); }
 input:focus-visible, textarea:focus-visible { border-color: var(--rule); }
 input::placeholder, textarea::placeholder { color: var(--muted); opacity: .8; }
+.project-field { position: relative; }
 .project-field input { margin-top: 8px; font-size: 17px; }
+.kit-details { margin-top: 6px; font-family: var(--font-display); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
+/* Kit-name suggestions from the catalogue */
+.kit-suggestions { position: absolute; left: 0; right: 0; z-index: 30; list-style: none; margin: 4px 0 0; padding: 4px; max-height: 360px; overflow-y: auto; background: var(--surface); border: 1.5px solid var(--rule); border-radius: var(--radius); box-shadow: 0 10px 28px color-mix(in oklch, var(--shade) 20%, transparent); }
+.kit-suggestion { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; padding: 8px 10px; border-radius: 2px; cursor: pointer; }
+.kit-suggestion[aria-selected="true"], .kit-suggestion:hover { background: var(--soft); }
+.kit-suggestion-name { font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+.kit-suggestion-meta { grid-column: 1; font-size: 13px; color: var(--muted); }
+.kit-suggestion-status { grid-column: 2; grid-row: 1 / span 2; align-self: center; font: 600 12px var(--mono); color: var(--muted); white-space: nowrap; }
+.kit-suggestion-status.has-list { color: var(--on-mark); background: var(--mark); padding: 3px 6px; border-radius: 2px; }
 .project-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; padding: 18px 0 28px; border-top: 1px solid var(--line); }
 .project-actions, .project-file { display: flex; gap: 8px; }
 .project-file { padding-left: 20px; border-left: 1px solid var(--line); }
@@ -325,6 +335,9 @@ footer a { color: inherit; }
 .kit-meta { font-family: var(--font-display); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
 .kit-stats { font-size: 14px; color: var(--muted); }
 .exact-badge { display: inline-block; margin-bottom: 4px; padding: 2px 7px; font: 700 12px var(--mono); color: var(--on-mark); background: var(--mark); border-radius: 2px; }
+.results-heading { padding: 14px 2px 6px; font-family: var(--font-display); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); border-bottom: 1px solid var(--row-line); }
+.catalogue-result .kit-result-title { font-size: 18px; }
+.kit-stats.has-list { color: var(--accent); font-weight: 600; }
 .kit-confirmed { font-size: 14px; font-weight: 600; color: var(--accent); }
 .report-reasons { border: 0; padding: 0; margin: 14px 0 0; }
 .report-reasons legend { font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; font-family: var(--font-display); }

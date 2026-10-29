@@ -25,7 +25,9 @@
   <script src="vendor/pdf-lib.min.js" defer></script>
   <script src="export.js" defer></script>
   <script src="cloud.js" defer></script>
+  <script src="catalogue.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="kit-picker.js" defer></script>
   <script src="community.js" defer></script>
 </head>
 <body>
@@ -76,12 +78,13 @@
       <nav id="site-nav" class="site-nav" aria-label="Pages" hidden>
         <a id="nav-workbench" href="#">Workbench</a>
         <a id="nav-kits" href="#/kits">Community kits</a>
+        <a id="nav-catalogue" href="#/catalogue">Kit catalogue</a>
       </nav>
     </header>
     <div id="workbench">
     <section class="project-header" aria-labelledby="page-title">
       <div><h1 id="page-title">A little order.<br> A better build.</h1><p class="intro">Enter parts in manual order. Cut them in runner order.</p></div>
-      <div class="project-field"><label for="project-name">Kit / project name <span class="optional">optional</span></label><input id="project-name" type="text" placeholder="Name your build" autocomplete="off"><p id="kit-hint" class="kit-hint" hidden>This kit may already be in the community library. <button id="kit-hint-open" type="button" class="text-button">View matches</button></p></div>
+      <div class="project-field"><label for="project-name">Kit / project name <span class="optional">optional</span></label><input id="project-name" type="text" placeholder="Start typing a kit, e.g. HG Zaku II" autocomplete="off"><p id="kit-details" class="kit-details" hidden></p><p id="kit-hint" class="kit-hint" hidden><span id="kit-hint-text">This kit may already be in the community library.</span> <button id="kit-hint-open" type="button" class="text-button">View matches</button></p></div>
     </section>
     <section class="project-tools" aria-label="Project management">
       <div class="project-actions"><button id="save-project" class="button primary">Save project</button><button id="new-project" class="button secondary">New project</button></div>
@@ -130,7 +133,7 @@
     </main>
     </div>
     <section id="community" class="community" aria-live="polite" hidden></section>
-    <footer><span>Built for the workbench.</span><span id="footer-storage">Projects are stored in this browser only · Use Export file to back them up</span><span id="footer-legal" hidden><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span></footer>
+    <footer><span>Built for the workbench · Kit names from <a href="https://gunpla.fyi" target="_blank" rel="noopener noreferrer">gunpla.fyi</a></span><span id="footer-storage">Projects are stored in this browser only · Use Export file to back them up</span><span id="footer-legal" hidden><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span></footer>
   </div>
   <dialog id="feedback-dialog" class="feedback-dialog" aria-labelledby="feedback-heading">
     <form id="feedback-form" novalidate>

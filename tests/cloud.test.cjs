@@ -65,6 +65,7 @@ test('labels, links and routes', () => {
   assert.deepEqual(C.parseRoute(`#/kits/${id}`), { page: 'kit', id });
   assert.deepEqual(C.parseRoute('#/kits'), { page: 'kits' });
   assert.deepEqual(C.parseRoute('#/admin'), { page: 'admin' });
+  assert.deepEqual(C.parseRoute('#/catalogue'), { page: 'catalogue' });
   assert.deepEqual(C.parseRoute('#workspace'), { page: 'workbench' });
   assert.deepEqual(C.parseRoute(''), { page: 'workbench' });
 });

@@ -14,5 +14,5 @@ trap '"$BIN/pg_ctl" -D "$DATA" -m immediate stop >/dev/null 2>&1 || true; rm -rf
 PSQL="$BIN/psql -h $DATA -p $PORT -U postgres -d postgres -v ON_ERROR_STOP=1 -q"
 $PSQL -f "$HERE/supabase-stub.sql"
 for migration in "$ROOT"/supabase/migrations/*.sql; do $PSQL -f "$migration"; done
-$PSQL -o /dev/null -f "$HERE/rls.test.sql"
+for suite in "$HERE"/rls.test.sql "$HERE"/catalogue.test.sql; do $PSQL -o /dev/null -f "$suite"; done
 echo "Database tests passed."
