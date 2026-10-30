@@ -44,6 +44,21 @@ The catalogue comes from [gunpla.fyi](https://gunpla.fyi) ([stevenla/gunpla-db](
 
 When the community library is on, every suggestion also shows "N parts lists" or "No parts list yet". The New project check lists catalogue kits under the shared parts lists, and a **Kit catalogue** page (`#/catalogue`) lets people filter by grade, scale and whether a parts list exists.
 
+## Visit counts
+
+When `goatcounterCode` is set in `dist/config.js`, `dist/analytics.js` loads GoatCounter (goatcounter.com): cookieless, no banner needed, and it doesn't count localhost. Besides page visits, including the community pages, it counts these actions, in the GoatCounter dashboard's events list:
+
+| Event | When |
+|---|---|
+| `pdf-export` | A PDF is downloaded; the title is the layout, e.g. "By Section · 1 page". |
+| `kit-picked` | A kit is chosen from the catalogue suggestions; the title is the kit name. |
+| `project-file-export` / `project-file-import` | A project file is saved or opened. |
+| `feedback-sent` | The feedback form is sent. |
+| `outbound-instagram`, `outbound-facebook`, `outbound-ko-fi` | A header link is clicked. |
+| `kit-shared`, `kit-updated`, `kit-used` | Community library actions, when it's switched on. |
+
+Nothing a person types is ever sent. Tag shared links with `?ref=instagram` or `?ref=facebook` and GoatCounter lists them under referrers.
+
 ## Community library (optional)
 
 When `dist/config.js` has Supabase settings, the app adds:
@@ -73,7 +88,8 @@ Unrecognised entries are highlighted and stay in the original input. Repeated pa
 ## Files
 
 - `dist/index.html`: accessible page structure and local asset loading.
-- `dist/config.js`: deployment settings: the feedback access key and the optional Supabase address and public key.
+- `dist/config.js`: deployment settings: the feedback access key, the optional Supabase address and public key, and the optional GoatCounter code.
+- `dist/analytics.js`: cookieless visit and action counts (GoatCounter).
 - `dist/styles.css`: light workshop layout, desktop/mobile breakpoints, and interface states.
 - `dist/parts.js`: pure parser, sorting, section operations, project validation, and localStorage helpers.
 - `dist/projects.js`: named project library, safe switching, duplicate-name protection, migration of the existing draft, and project file export/import.

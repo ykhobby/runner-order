@@ -16,6 +16,7 @@
   let exportURL = null;
   let exportedData = null;
   const changeListeners = [];
+  const track = (name, title) => window.RunnerAnalytics && window.RunnerAnalytics.event(name, title);
   const exportData = () => JSON.stringify({ name: project.name, sections: project.sections });
   const icons = {
     up: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg>',
@@ -105,6 +106,7 @@
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+    track('project-file-export');
     $('project-status').textContent = `Exported "${project.name.trim() || 'Untitled project'}" as a file. Keep it as a backup or import it on another device.`;
   });
   $('import-project').addEventListener('click', () => $('import-file').click());
@@ -115,7 +117,7 @@
     let imported;
     try { imported = L.readProjectFile(await file.text()); }
     catch (error) { $('project-status').textContent = error.message; return; }
-    projectAction(next => L.importProject(next, imported), result => `Imported "${result.entry.project.name}"${result.saved ? ` and saved "${result.saved.project.name}"` : ''}.`);
+    if (projectAction(next => L.importProject(next, imported), result => `Imported "${result.entry.project.name}"${result.saved ? ` and saved "${result.saved.project.name}"` : ''}.`)) track('project-file-import');
   });
   $('saved-projects').addEventListener('change', event => { $('open-project').disabled = !event.target.value; });
   $('open-project').addEventListener('click', () => {
@@ -356,6 +358,7 @@
       exportedData = JSON.stringify({ name: snapshot.name, sections: snapshot.sections });
       link.click();
       $('export-status').textContent = 'PDF ready. If the download does not start, use the save link below.';
+      track('pdf-export', `${{ section: 'By Section', runner: 'By Runner', both: 'Both' }[mode]} · ${pageCount} ${pageCount === 1 ? 'page' : 'pages'}`);
     } catch (error) {
       $('export-status').textContent = `Could not create the PDF. ${error.message || 'Please try again.'}`;
     } finally {
@@ -428,6 +431,7 @@
       if (!response.ok || !result.success) throw new Error(result.message);
       $('feedback-form').reset();
       $('feedback-status').textContent = 'Thanks! Your feedback was sent.';
+      track('feedback-sent');
     } catch {
       $('feedback-status').textContent = 'Could not send your feedback. Check your connection and try again.';
     } finally {

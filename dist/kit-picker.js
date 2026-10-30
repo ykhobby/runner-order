@@ -61,6 +61,7 @@
       picking = true;
       try { onPick(entry); } finally { picking = false; }
       pickListeners.forEach(listener => listener(entry, input));
+      if (window.RunnerAnalytics) window.RunnerAnalytics.event('kit-picked', K.projectName(entry));
     }
     async function update() {
       if (picking) return;

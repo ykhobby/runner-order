@@ -44,6 +44,7 @@
     return (...args) => { clearTimeout(timer); timer = setTimeout(() => callback(...args), wait); };
   }
   const status = message => { $('project-status').textContent = message; };
+  const track = (name, title) => window.RunnerAnalytics && window.RunnerAnalytics.event(name, title);
   const emailPattern = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[a-z]{2,}$/i;
   const uuidIn = value => (String(value).match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i) || [])[0];
 
@@ -340,7 +341,7 @@
     if (!kit) { status('That kit is no longer available.'); return; }
     $('precheck-dialog').close();
     const added = App.projectAction(next => L.importProject(next, C.projectFromKit(kit)),
-      result => `Added "${result.entry.project.name}" from the community library${result.saved ? ` and saved "${result.saved.project.name}"` : ''}.`);
+      result => (track('kit-used', kit.title), `Added "${result.entry.project.name}" from the community library${result.saved ? ` and saved "${result.saved.project.name}"` : ''}.`));
     if (added) location.hash = '';
   }
 
@@ -467,6 +468,7 @@
       if (!next.current.name.trim()) next.current.name = details.title;
       return L.saveCurrent(next);
     }, () => `Shared "${details.title}" to the community library.`);
+    track(details.sharedKitId ? 'kit-updated' : 'kit-shared', details.title);
     if (!saved) App.project().kit = kit;
     loadCounts();
     $('share-done-message').textContent = `"${details.title}" is in the community library. Anyone can now find it, use it, and print a cutting sheet.`;
@@ -496,6 +498,7 @@
       if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
     }
     if (!onCommunity) return;
+    if (window.RunnerAnalytics) window.RunnerAnalytics.page(`/${target.page === 'kit' ? 'kits/kit' : target.page}`);
     if (changedPage || target.page !== 'kits') window.scrollTo(0, 0);
     const token = ++renderToken;
     if (target.page === 'kits') renderLibrary(token);

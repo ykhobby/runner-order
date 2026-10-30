@@ -5,5 +5,7 @@ window.RunnerNotesConfig = {
   // Community library (accounts, cloud saves, shared kits). Leave blank to keep those features hidden.
   // Both values come from Supabase: Project Settings > API. The anon key is designed to be public.
   supabaseUrl: '',
-  supabaseAnonKey: ''
+  supabaseAnonKey: '',
+  // Visit counts (GoatCounter, no cookies). Your site code: e.g. 'runnerorder' for runnerorder.goatcounter.com.
+  goatcounterCode: 'ykhobby'
 };
